@@ -1,30 +1,28 @@
+import os
 from typing import List, Dict, Any
+import requests
 
+
+AUTH_TOKEN = os.environ.get("API_AUTH_TOKEN")
 API_URL = 'https://fake-api-vycpfa6oca-uc.a.run.app/'
 
 
-def get_sales(date: str) -> List[Dict[str, Any]]:
+def get_sales(date: str, page: int) -> List[Dict[str, Any]]:
     """
-    Get data from sales API for specified date.
+    Get data from sales API for specified date and page.
 
     :param date: data retrieve the data from
+    :param page: the page number
     :return: list of records
     """
-    # TODO: implement me
-
-    # dummy return:
-    return [
-        {
-            "client": "Tara King",
-            "purchase_date": "2022-08-09",
-            "product": "Phone",
-            "price": 1062
-        },
-        {
-            "client": "Lauren Hawkins",
-            "purchase_date": "2022-08-09",
-            "product": "TV",
-            "price": 1373
-        },
-        # ...
-    ]
+    try:
+        response = requests.get (
+            url=API_URL+'sales',
+            params={'date': date, 'page': page},
+            headers={'Authorization': AUTH_TOKEN}
+        )
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error while connecting to {API_URL}: {e}")
+        raise e

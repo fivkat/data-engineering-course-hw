@@ -1,5 +1,5 @@
 """
-Tests dal.local_disk.py module
+Tests dal.read_disk.py module
 # TODO: write tests
 """
 from unittest import TestCase, mock
