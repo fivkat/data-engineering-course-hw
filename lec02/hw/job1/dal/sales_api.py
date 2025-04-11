@@ -2,7 +2,6 @@ import os
 from typing import List, Dict, Any
 import requests
 
-
 AUTH_TOKEN = os.environ.get("API_AUTH_TOKEN")
 API_URL = 'https://fake-api-vycpfa6oca-uc.a.run.app/'
 
@@ -16,8 +15,8 @@ def get_sales(date: str, page: int) -> List[Dict[str, Any]]:
     :return: list of records
     """
     try:
-        response = requests.get (
-            url=API_URL+'sales',
+        response = requests.get(
+            url=API_URL + 'sales',
             params={'date': date, 'page': page},
             headers={'Authorization': AUTH_TOKEN}
         )

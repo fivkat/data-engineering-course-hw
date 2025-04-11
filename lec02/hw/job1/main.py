@@ -1,13 +1,12 @@
 """
 This file contains the controller that accepts command via HTTP
-and trigger business logic layer
+and trigger business logic layer to get sales from API and write them to the local disk
 """
 import os
 from flask import Flask, request
 from flask import typing as flask_typing
 
 from lec02.hw.job1.bll.sales_api import save_sales_to_local_disk
-
 
 AUTH_TOKEN = os.environ.get("API_AUTH_TOKEN")
 
@@ -24,7 +23,7 @@ def main() -> flask_typing.ResponseReturnValue:
     Controller that accepts command via HTTP and
     trigger business logic layer
 
-    Proposed POST body in JSON:
+    The POST body in JSON:
     {
       "date": "2022-08-09",
       "raw_dir": "/path/to/my_dir/raw/sales/2022-08-09"

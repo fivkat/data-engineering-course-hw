@@ -1,34 +1,28 @@
 import os
+
 from lec02.hw.job2.dal import read_disk, write_disk
+from lec02.hw.common.dal import directory_process
 
 
 def convert_to_avro(raw_dir: str, stg_dir: str) -> None:
     """
-
-    :param raw_dir:
-    :param stg_dir:
-    :return:
+    Take JSON files from the raw directory and save them in avro format to the stg directory.
+    :param raw_dir: the path to the source directory with JSON files
+    :param stg_dir: the path to the target directory to write avro files to
+    :return: None
     """
 
-    # Step 1: Check if the raw_dir folder exists
-    if not os.path.exists(raw_dir):
-        raise FileNotFoundError(f"The path '{raw_dir}' does not exist.")
+    # Check the raw_dir path and content
+    directory_process.check_dir_path(raw_dir, raise_error=True)
+    directory_process.check_dir_content(raw_dir, raise_error=True)
 
-    # Step 2: Check if the raw_dir folder is empty
-    if not os.listdir(raw_dir):
-        print("There are no files in the raw_dir")
-        return
+    # Ensure that the stg directory exists and empty
+    is_directory_exists = directory_process.check_dir_path(stg_dir)
 
-    # Step 3: Check if the stg_dir folder exists, if so, empty it, else create one.
-    if not os.path.exists(stg_dir):
-        os.makedirs(stg_dir)
-        print(f"Folder '{stg_dir}' created.")
+    if is_directory_exists:
+        directory_process.empty_directory(stg_dir)
     else:
-        for filename in os.listdir(stg_dir):
-            file_path = os.path.join(stg_dir, filename)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-                print(f"Deleted file: {file_path}")
+        directory_process.make_dir(stg_dir)
 
     schema = {
         "type": "record",
@@ -57,5 +51,3 @@ def convert_to_avro(raw_dir: str, stg_dir: str) -> None:
         json_file = read_disk.read_json(raw_dir, filename)
         avro_file_name = filename.replace('json', 'avro')
         write_disk.write_to_avro(json_file, stg_dir, avro_file_name, schema)
-
-
