@@ -35,9 +35,8 @@ def test_save_sales_to_local_disk_success(mock_sales_api, mock_local_disk, mock_
 
 
 @patch('lec02.hw.job1.bll.sales_api.directory_process')
-@patch('lec02.hw.job1.bll.sales_api.local_disk')
 @patch('lec02.hw.job1.bll.sales_api.sales_api')
-def test_save_sales_to_local_disk_http_error(mock_sales_api, mock_local_disk, mock_directory_process):
+def test_save_sales_to_local_disk_http_error(mock_sales_api, mock_directory_process):
     # Mock directory operations
     mock_directory_process.check_dir_path.return_value = False
     mock_directory_process.make_dir.return_value = None

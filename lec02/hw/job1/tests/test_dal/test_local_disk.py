@@ -1,5 +1,6 @@
 from unittest.mock import mock_open, patch
 
+import pytest
 from lec02.hw.job1.dal.local_disk import save_json_to_disk
 
 
@@ -17,3 +18,19 @@ def test_save_json_to_disk(mock_json_dump, mock_open_file, mock_path_join):
     mock_path_join.assert_called_once_with("/mock/path", "mock_file.json")
     mock_open_file.assert_called_once_with("/mock/path/mock_file.json", "w")
     mock_json_dump.assert_called_once_with([{"key": "value"}], mock_open_file(), indent=4)
+
+@patch("os.path.join")
+@patch("builtins.open", side_effect=OSError("File write error"))
+@patch("json.dump")
+def test_save_json_to_disk_file_write_error(mock_json_dump, mock_open_file, mock_path_join):
+    # Mock the os.path.join behavior
+    mock_path_join.return_value = "/mock/path/mock_file.json"
+
+    # Call the function and expect an exception
+    with pytest.raises(OSError, match="File write error"):
+        save_json_to_disk([{"key": "value"}], "/mock/path", "mock_file.json")
+
+    # Assertions
+    mock_path_join.assert_called_once_with("/mock/path", "mock_file.json")
+    mock_open_file.assert_called_once_with("/mock/path/mock_file.json", "w")
+
