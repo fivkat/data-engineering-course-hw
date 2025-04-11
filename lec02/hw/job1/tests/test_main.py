@@ -1,68 +1,55 @@
-"""
-Tests for main.py
-# TODO: write tests
-"""
-from unittest import TestCase, mock
+from unittest.mock import patch
 
-# NB: avoid relative imports when you will write your code
-from .. import main
+import pytest
+from lec02.hw.job1.main import app
 
 
-class MainFunctionTestCase(TestCase):
+@pytest.fixture
+def client():
+    app.config["TESTING"] = True
+    with app.test_client() as client:
+        yield client
 
-    @classmethod
-    def setUpClass(cls) -> None:
-        main.app.testing = True
-        cls.client = main.app.test_client()
+
+@patch("lec02.hw.job1.main.save_sales_to_local_disk")
+def test_main_success(mock_save_sales, client):
+    response = client.post(
+        "/",
+        json={
+            "date": "2022-08-09",
+            "raw_dir": "/path/to/my_dir/raw/sales/2022-08-09",
+        },
+    )
+
+    # Assertions
+    mock_save_sales.assert_called_once_with(
+        date="2022-08-09", raw_dir="/path/to/my_dir/raw/sales/2022-08-09"
+    )
+    assert response.status_code == 201
+    assert response.json == {"message": "Data retrieved successfully from API"}
 
 
-    @mock.patch('lesson_02.ht_template.job1.main.save_sales_to_local_disk')
-    def test_return_400_date_param_missed(
-            self,
-            get_sales_mock: mock.MagicMock
-        ):
-        """
-        Raise 400 HTTP code when no 'date' param
-        """
-        resp = self.client.post(
-            '/',
-            json={
-                'raw_dir': '/foo/bar/',
-                # no 'date' set!
-            },
-        )
+def test_main_missing_date(client):
+    response = client.post(
+        "/",
+        json={
+            "raw_dir": "/path/to/my_dir/raw/sales/2022-08-09",
+        },
+    )
 
-        self.assertEqual(400, resp.status_code)
+    # Assertions
+    assert response.status_code == 400
+    assert response.json == {"message": "date parameter missed"}
 
-    def test_return_400_raw_dir_param_missed(self):
-        pass
 
-    @mock.patch('lesson_02.ht_template.job1.main.save_sales_to_local_disk')
-    def test_save_sales_to_local_disk(
-            self,
-            save_sales_to_local_disk_mock: mock.MagicMock
-    ):
-        """
-        Test whether api.get_sales is called with proper params
-        """
-        fake_date = '1970-01-01'
-        fake_raw_dir = '/foo/bar/'
-        self.client.post(
-            '/',
-            json={
-                'date': fake_date,
-                'raw_dir': fake_raw_dir,
-            },
-        )
+def test_main_missing_raw_dir(client):
+    response = client.post(
+        "/",
+        json={
+            "date": "2022-08-09",
+        },
+    )
 
-        save_sales_to_local_disk_mock.assert_called_with(
-            date=fake_date,
-            raw_dir=fake_raw_dir,
-        )
-
-    @mock.patch('lesson_02.ht_template.job1.main.save_sales_to_local_disk')
-    def test_return_201_when_all_is_ok(
-            self,
-            get_sales_mock: mock.MagicMock
-    ):
-        pass
+    # Assertions
+    assert response.status_code == 400
+    assert response.json == {"message": "raw_dir parameter missed"}
