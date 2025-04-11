@@ -12,8 +12,8 @@ if not BASE_DIR:
 JOB1_PORT = 8081
 JOB2_PORT = 8082
 
-RAW_DIR = os.path.join(BASE_DIR, "raw", "sales", "2022-08-09")
-STG_DIR = os.path.join(BASE_DIR, "stg", "sales", "2022-08-09")
+RAW_DIR = os.path.join(BASE_DIR, "file_storage", "raw", "sales", "2022-08-09")
+STG_DIR = os.path.join(BASE_DIR, "file_storage", "stg", "sales", "2022-08-09")
 
 
 def run_job1():
