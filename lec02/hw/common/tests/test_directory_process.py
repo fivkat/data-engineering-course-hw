@@ -62,9 +62,11 @@ def test_check_dir_content_no_files_with_error(mock_listdir):
 
 @patch("os.listdir")
 @patch("os.remove")
-def test_empty_directory(mock_remove, mock_listdir):
+@patch("os.path.isfile")
+def test_empty_directory(mock_isfile, mock_remove, mock_listdir):
     mock_listdir.return_value = ["file1", "file2"]
     mock_remove.side_effect = lambda x: None  # Simulate file deletion
+    mock_isfile.return_value = True
     empty_directory("/test/path")
     mock_listdir.assert_called_once_with("/test/path")
     mock_remove.assert_any_call(os.path.join("/test/path", "file1"))
