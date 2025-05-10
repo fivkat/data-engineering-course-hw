@@ -26,7 +26,7 @@ def process_iris_data(**kwargs):
     
     # Query the processed Iris data from the dbt-transformed table
     query = """
-    SELECT * FROM homework.iris_processed
+    SELECT * FROM analytics.iris_processed
     """
     
     df = pd.read_sql(query, engine)
@@ -124,10 +124,12 @@ def process_iris_data(**kwargs):
         """)
         
         # Save model metrics
+        results_df.columns = results_df.columns.str.lower()
         results_df.to_sql('iris_model_metrics', connection, schema='ml_results', 
                           if_exists='append', index=False)
         
         # Save feature importance
+        feature_importance_df.columns = feature_importance_df.columns.str.lower()
         feature_importance_df.to_sql('iris_feature_importance', connection, schema='ml_results', 
                                     if_exists='append', index=False)
     

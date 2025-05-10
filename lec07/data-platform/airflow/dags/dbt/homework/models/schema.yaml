@@ -15,6 +15,7 @@ models:
       - name: species
         description: "Species of Iris flower"
 
+#TODO: update the schema
   - name: iris_processed
     description: "Processed Iris dataset with ML preprocessing transformations"
     columns:

@@ -10,3 +10,4 @@ numpy>=1.23.0
 apache-airflow-providers-docker>=2.1.0
 apache-airflow-providers-http>=2.0.1
 apache-airflow-providers-common-sql>=1.0.0
+Matts52/dbt_ml_inline_preprocessing>=0.2.0

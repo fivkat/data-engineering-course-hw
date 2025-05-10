@@ -56,9 +56,10 @@ select
     {% endfor %}
 
     -- Log Transformation
+    -- Replaced with the local macros because PostgreSQL does not support the logarithms with base
     {% for variable in base_variables %}
         {{
-            dbt_ml_inline_preprocessing.log_transform(
+            log_transform(
                 column=variable
             )
         }} as {{ variable }}_logged,

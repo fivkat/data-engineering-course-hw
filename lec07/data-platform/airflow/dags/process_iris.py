@@ -8,7 +8,7 @@ from datetime import timedelta
 from datetime import datetime
 import os
 import subprocess
-import pendulum
+import logging
 
 # Import our custom operator
 from dbt_operator import DbtOperator
@@ -16,7 +16,7 @@ from dbt_operator import DbtOperator
 # Get environment variables
 ANALYTICS_DB = os.getenv('ANALYTICS_DB', 'analytics')
 PROJECT_DIR = os.getenv('AIRFLOW_HOME')+"/dags/dbt/homework"
-EMAIL = os.getenv('EMAIL')
+EMAIL = os.getenv('EMAIL_TO')
 PROFILE = 'homework'
 
 
@@ -29,9 +29,6 @@ default_args = {
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
 }
-
-# Set timezone to Europe/Kyiv using pendulum
-kyiv_tz = pendulum.timezone("Europe/Kiev")
 
 def run_train_model():
     try:
@@ -50,6 +47,8 @@ def run_train_model():
         raise
 
 def dag_success_callback(context):
+    logging.info("✅ Success callback triggered for DAG: %s", context['dag'].dag_id)
+
     subject = f"DAG {context['dag'].dag_id} succeeded ✅"
     body = f"""
     <h3>DAG Succeeded</h3>
@@ -58,17 +57,22 @@ def dag_success_callback(context):
     <p><b>Execution Date:</b> {context['execution_date']}</p>
     <p><a href="{context['task_instance'].log_url}">View Logs</a></p>
     """
-    send_email(to=EMAIL, subject=subject, html_content=body)
+    try:
+        send_email(to='your_email@example.com', subject=subject, html_content=body)
+        logging.info("📧 Success email sent")
+    except Exception as e:
+        logging.error("❌ Failed to send success email: %s", str(e))
+
 
 dag = DAG(
     'process_iris',
     default_args=default_args,
     description='Run dbt transformations for the iris data and use it for ML training',
     schedule_interval='0 1 * * *',
-    start_date=datetime(2025,4,22, tzinfo=kyiv_tz),
-    end_date=datetime(2025,4,24, tzinfo=kyiv_tz),
-    catchup=False,
-    tags=['dbt', 'ML'],
+    start_date=datetime(2025, 4, 22),
+    end_date=datetime(2025, 4, 25),
+    catchup=True,
+    tags=['dbt', 'ML_training'],
     on_success_callback=dag_success_callback
 )
 

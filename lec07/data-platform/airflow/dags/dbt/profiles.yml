@@ -20,5 +20,5 @@ homework:
       password: "{{ env_var('ETL_PASSWORD') }}"
       port: 5432
       dbname: "{{ env_var('ANALYTICS_DB', 'analytics') }}"
-      schema: homework
+      schema: analytics
       threads: 4
